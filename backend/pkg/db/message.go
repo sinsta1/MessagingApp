@@ -109,3 +109,23 @@ func GetMessageByID(id int) (*models.Message, []models.Response, error) {
 	return message, responses, nil
 }
 
+func SearchMessagesByKeyword(keyword string) ([]models.Message, error) {
+    query := "SELECT id, customer_name, customer_email, message, status FROM messages WHERE message LIKE ?"
+    rows, err := DB.Query(query, "%"+keyword+"%")
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+
+    var messages []models.Message
+    for rows.Next() {
+        var msg models.Message
+        err := rows.Scan(&msg.ID, &msg.CustomerName, &msg.CustomerEmail, &msg.MessageText, &msg.Status)
+        if err != nil {
+            return nil, err
+        }
+        messages = append(messages, msg)
+    }
+    return messages, nil
+}
+

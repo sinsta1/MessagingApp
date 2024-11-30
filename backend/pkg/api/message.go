@@ -63,7 +63,7 @@ func GetMessageHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Path[len("/api/messages/"):]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid message ID")
+		utils.SendErrorResponse(w, http.StatusBadRequest, "Invalid message IDkjfd")
 		return
 	}
 
@@ -132,3 +132,23 @@ func RespondToMessageHandler(w http.ResponseWriter, r *http.Request) {
 		"message": "Response submitted successfully",
 	})
 }
+
+func SearchMessageHandler(w http.ResponseWriter, r *http.Request) {
+    queryParams := r.URL.Query()
+    keyword := queryParams.Get("keyword") // For text-based search
+
+    var results []models.Message
+    var err error
+
+    if keyword != "" {
+        results, err = db.SearchMessagesByKeyword(keyword)
+    }
+
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+
+    json.NewEncoder(w).Encode(results)
+}
+
